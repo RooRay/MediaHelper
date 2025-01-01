@@ -1,5 +1,5 @@
 const rewrites: [RegExp, string][] = [
-  [/instagram.com\/reels\//i, 'instagram.com/reel/'],
+  [/^instagram.com\/reels\/$/i, 'instagram.com/reel/'],
 ];
 
 export default function rewrite(content: string) {
