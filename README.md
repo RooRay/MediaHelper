@@ -1,11 +1,6 @@
 # MediaHelper
 
-This bot watches chat for video links and replies to messages containing supported links with an embedded video,
-so you don't need to click the link to watch shared videos.
-
-Idea and hosting by [@RTCFlyer](https://github.com/RTCFlyer).
-
-[**Click here to add MediaHelper**](https://discord.com/oauth2/authorize?client_id=1026547091121655808&permissions=274878032960&scope=bot%20applications.commands)
+This is a fork of the popular [Media Helper](https://github.com/eartharoid/discord-media-helper) repository but with some adjustments to make it easier to self-host, along with some UX enhancements and touch ups along the way!
 
 ## Supported links
 
