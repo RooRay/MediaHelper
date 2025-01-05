@@ -1,9 +1,19 @@
+import PQueue from 'p-queue';
+import ms from 'ms';
 import { spawn } from 'child_process';
 import { join } from 'node:path';
 import { rm } from 'fs/promises';
 import log from './log.js';
 import env from './env.js';
 import { exists, tmpDir } from './fs.js';
+
+const timeout = ms(process.env.FFMPEG_TIMEOUT || '5m');
+
+const queue = new PQueue({
+  concurrency: parseInt(process.env.FFMPEG_MAX_CONCURRENCY || '4', 10),
+  timeout: timeout + 1000,
+  throwOnTimeout: true,
+});
 
 export default async function transcode(fileName: string): Promise<void> {
   const bin = env.FFMPEG_BIN;
@@ -23,10 +33,11 @@ export default async function transcode(fileName: string): Promise<void> {
     'warning',
     join(env.DOWNLOAD_DIR, fileName),
   ];
-  log.verbose('Spawning `%s %s`', bin, args.join(' '));
-  return new Promise((fulfil, reject) => {
+  log.info('Queueing `%s %s`', bin, args.join(' '));
+  return queue.add(() => new Promise((fulfil, reject) => {
+    log.info('Spawning `%s %s`', bin, args.join(' '));
     log.info('Transcoding %s', fileName);
-    const child = spawn(bin, args);
+    const child = spawn(bin, args, { timeout });
     child.stdout.on('data', (line) => {
       const str = line.toString();
       log.info.ffmpeg(str);
@@ -46,5 +57,5 @@ export default async function transcode(fileName: string): Promise<void> {
       log.verbose('Removing temporary %s file', fileName);
       await rm(join(tmpDir, fileName));
     });
-  });
+  }));
 }
